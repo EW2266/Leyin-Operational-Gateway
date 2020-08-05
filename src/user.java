@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
@@ -17,25 +18,22 @@ public class user {
 	}
 
 	private void read(String str)  throws IOException{
+		System.getProperty("file.encoding", "UTF-8");
 		InputStream fis = null;
 		InputStreamReader isr = null;
 		String data = "";
 		String filename = "resources/users/" + str;
 		System.out.println(filename);
-		char c;
-		int i;
 		try {
 			// new input stream reader is created 
-			fis = this.getClass().getResourceAsStream(filename);
-			isr = new InputStreamReader(fis);
 			// read till the end of the file
-			while((i = isr.read())!=-1) {
-				c = (char)i;
-				System.out.println(":"+c);
-				if(c != '\r' && c!= '\n')
-					data += c;
+			fis = this.getClass().getResourceAsStream(filename);
+			System.out.println(fis);
+			str = "";
+			BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF8"));
+			while((str = in.readLine()) != null ) {
+				data += (str);
 			}
-			System.out.println(data);
 
 		}catch (Exception e) {
 			// print error

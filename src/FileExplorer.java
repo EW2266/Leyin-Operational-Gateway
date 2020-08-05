@@ -14,8 +14,15 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class FileExplorer extends javax.swing.JFrame {
-
+	private javax.swing.JPanel container;
+	private javax.swing.JTextField in;
+	private javax.swing.JButton jButton1;
+	private javax.swing.JLabel jLabel1;
+	private javax.swing.JLabel jLabel2;
+	private javax.swing.JPanel jPanel1;
+	private javax.swing.JScrollPane jScrollPane1;
 	ArrayList<File> stack;
+	ArrayList<File> all;
 	user logged;
 	
 	public FileExplorer() throws URISyntaxException {
@@ -28,6 +35,8 @@ public class FileExplorer extends javax.swing.JFrame {
 		String jarDir = jarFile.getParentFile().getPath();
 		System.out.println(jarDir.toString());
 		String path = jarDir + "/resources";
+		all = new ArrayList<File>();
+		getallfiles(path);
 		LoadBase(path);
 	}
 	
@@ -35,7 +44,36 @@ public class FileExplorer extends javax.swing.JFrame {
 		logged = u;
 	}
 	
-	
+	public void getallfiles(String path) {
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+		ArrayList<File> folders = new ArrayList<File>();
+		for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
+		  if (listOfFiles[i].isFile()) {
+		    System.out.println("File " + listOfFiles[i].getName());
+		    all.add(listOfFiles[i]);
+		  } else if (listOfFiles[i].isDirectory()) {
+		    System.out.println("Directory " + listOfFiles[i].getName());
+		    folders.add(listOfFiles[i]);
+		    all.add(listOfFiles[i]);
+		  }
+		}
+		if(folders.size() > 0) {
+			File newfolder = new File(folders.get(0).getPath());
+			File[] newlistOfFiles = newfolder.listFiles();
+			for (int i = 0; i < newlistOfFiles.length; i++) {
+			  if (newlistOfFiles[i].isFile()) {
+			    System.out.println("File " + newlistOfFiles[i].getName());
+			    all.add(newlistOfFiles[i]);
+			  } else if (newlistOfFiles[i].isDirectory()) {
+			    System.out.println("Directory " + newlistOfFiles[i].getName());
+			    folders.add(newlistOfFiles[i]);
+			    all.add(newlistOfFiles[i]);
+			  }
+			}
+			folders.remove(0);
+		}
+	}
 	
 	public void LoadBase(String dir) {
 		File f = new File(dir);
@@ -191,15 +229,24 @@ public class FileExplorer extends javax.swing.JFrame {
 	}//GEN-LAST:event_jButton1ActionPerformed
 
 	private void inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inActionPerformed
-		if (new File(in.getText()).exists()) {
-			container.removeAll();
-			stack.add(new File(in.getText()));
-			LoadBase(in.getText());
-			container.revalidate();
-			container.repaint();
-		} else {
+		
+		System.out.println(in.getText());
+		int i = 1;
+		for(File a : all) {
+			i++;
+			if (in.getText().equals(a.getName())) {
+				container.removeAll();
+				stack.add(a);
+				LoadBase(a.getPath());
+				container.revalidate();
+				container.repaint();
+				break;
+			}
+		}
+		if(i > all.size()) {
 			JOptionPane.showMessageDialog(rootPane, "Invalid Directory", "Error", JOptionPane.ERROR_MESSAGE);
 		}
+		
 
 	}//GEN-LAST:event_inActionPerformed
 
@@ -214,12 +261,6 @@ public class FileExplorer extends javax.swing.JFrame {
 
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JPanel container;
-	private javax.swing.JTextField in;
-	private javax.swing.JButton jButton1;
-	private javax.swing.JLabel jLabel1;
-	private javax.swing.JLabel jLabel2;
-	private javax.swing.JPanel jPanel1;
-	private javax.swing.JScrollPane jScrollPane1;
+	
 	// End of variables declaration//GEN-END:variables
 }

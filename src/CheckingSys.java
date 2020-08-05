@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ public class CheckingSys {
 	private boolean inlist = false;
 	
 	public CheckingSys(JTextField text1, JPasswordField text2) throws IOException {
+		System.getProperty("file.encoding", "UTF-8");
 		names = new ArrayList<>();
 		readlist();
 		username = text1.getText();
@@ -60,31 +62,20 @@ public class CheckingSys {
 		InputStream fis = null;
 		InputStreamReader isr = null;
 		ArrayList<String> list = new ArrayList<String>();
-		char c;
-		int i;
 		try {
 			// new input stream reader is created 
 			fis = this.getClass().getResourceAsStream("resources/userlist.txt");
 			//System.out.println(fis);
-			isr = new InputStreamReader(fis);
+			isr = new InputStreamReader(fis,"UTF-8");
 			String str = "";
 			// read till the end of the file
-			while((i = isr.read())!=-1) {
-				c = (char)i;
-				System.out.println(":"+c);
-				if(c != ' ' && c != '\n' && c != '\r') {
-					str += c;
-				}
-				else {
-					list.add(str);
-					System.out.println(str);
-					str = "";
-				}
-			}
-			list.add(str);
-			System.out.println(str);
-			names.addAll(list);
-			
+			BufferedReader in = new BufferedReader(isr);
+			while((str = in.readLine()) != null ) {
+				System.out.println(str);
+				list.add(str);
+			}		
+			//System.out.println(str);
+			names.addAll(list);	
 		}catch (Exception e) {
 			// print error
 			e.printStackTrace();
