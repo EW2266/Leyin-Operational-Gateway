@@ -19,7 +19,7 @@ public class LoginPanel extends JFrame implements ActionListener{
 	private boolean loginpassed;
 
 	public LoginPanel() throws IOException {	
-		uiframe = new JFrame("pre alpha ver.");
+		uiframe = new JFrame("EW pre alpha ver.");
 		text1 = new JTextField(); 
 		text2 = new JPasswordField();
 		button1 = new JButton();
@@ -119,15 +119,14 @@ public class LoginPanel extends JFrame implements ActionListener{
 				//System.out.println("longging in...");
 				loginpassed = true;
 
-				System.out.println(this.getloginpassed());
-				FileExplorer system = new FileExplorer();
-				system.getUser(check.giveUSer());
+				//System.out.println(this.getloginpassed());
+				systempanel system = new systempanel(check.giveUser());
 				this.dispose();
 				
-				system.setVisible(true);
+				
 
 			}
-		} catch (IOException | URISyntaxException e1) {
+		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}

@@ -9,6 +9,8 @@ import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -29,6 +31,7 @@ public class FileExplorer extends javax.swing.JFrame {
 		initComponents();
 		this.setLocationRelativeTo(null);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		container.setLayout(null);
 		stack = new ArrayList<>();
 		CodeSource codeSource = main.class.getProtectionDomain().getCodeSource();
 		File jarFile = new File(codeSource.getLocation().toURI().getPath());
@@ -79,23 +82,43 @@ public class FileExplorer extends javax.swing.JFrame {
 		File f = new File(dir);
 		File[] s = f.listFiles();
 		try {
-			for (File s1 : s) {
+			for (int i = 0; i < s.length; i++) {
+				File s1 = s[i]; 
 				JButton btn;
-				if (s1.getName().length() > 20) {
-					btn = new JButton(s1.getName().substring(0, 20)+ "..") ;
-				} else {
-					btn = new JButton(s1.getName());
-				}
+				btn = new JButton(s1.getName());
+				
 				if (s1.isFile()) {
-					btn.setBackground(Color.BLACK);
+					if(s1.getName().contains("jpg")||s1.getName().contains("png")) {
+						btn.setBackground(Color.BLACK);
+					}
+					else if(s1.getName().contains("pdf")) {
+						btn.setBackground(Color.GRAY);
+					}
+					else if(s1.getName().contains("docx")||(s1.getName().contains("doc"))){
+						btn.setBackground(Color.BLUE);
+					}
+					else if(s1.getName().contains("xlsx")){
+						btn.setBackground(Color.GREEN);
+					}
+					else if(s1.getName().contains("pptx")||(s1.getName().contains("ppt"))){
+						btn.setBackground(Color.ORANGE);
+					}
+					else{
+						btn.setBackground(Color.RED);
+					}
 					btn.setForeground(Color.WHITE);
 				} else {
 					btn.setBackground(Color.WHITE);
 				}
+				btn.setBounds(0, i*50, container.getWidth(), 50);
 				btn.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if (s1.isFile()) {
+						if(stack.size() >= 1 && logged.getperm() != 1) {
+							System.out.println("not high enough permisison");
+							JOptionPane.showMessageDialog(rootPane, "You don't have high engough permission", "Sorry", JOptionPane.ERROR_MESSAGE);
+						}
+						else if (s1.isFile()) {
 							try {
 								if(logged.getperm() == 1) {
 									Desktop.getDesktop().open(s1);
@@ -107,7 +130,8 @@ public class FileExplorer extends javax.swing.JFrame {
 								JOptionPane.showMessageDialog(rootPane, "Cant open the file!", "Sorry", JOptionPane.ERROR_MESSAGE);
 								Logger.getLogger(FileExplorer.class.getName()).log(Level.SEVERE, null, ex);
 							}
-						} else {
+						} 
+						else {
 							System.out.println("going to next directory");
 							stack.add(f);
 							container.removeAll();
@@ -119,7 +143,7 @@ public class FileExplorer extends javax.swing.JFrame {
 					}
 				});
 				container.add(btn);
-				System.out.println(s1);
+				//System.out.println(s1);
 			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(rootPane, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -161,17 +185,23 @@ public class FileExplorer extends javax.swing.JFrame {
 
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
+		
+		
+		 
 		jPanel1Layout.setHorizontalGroup(
 				jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel1Layout.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 347, Short.MAX_VALUE)
-						.addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(in, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addContainerGap())
+		                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+		                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 347, Short.MAX_VALUE)
+		                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+		                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+		                .addComponent(in, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+		                .addContainerGap())
 				);
+		
+		
+		
 		jPanel1Layout.setVerticalGroup(
 				jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel1Layout.createSequentialGroup()
@@ -184,7 +214,8 @@ public class FileExplorer extends javax.swing.JFrame {
 								.addComponent(jButton1))
 						.addContainerGap(13, Short.MAX_VALUE))
 				);
-
+		
+		
 		container.setLayout(new java.awt.GridLayout(0, 3, 10, 10));
 		jScrollPane1.setViewportView(container);
 

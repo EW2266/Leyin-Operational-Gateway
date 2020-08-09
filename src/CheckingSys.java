@@ -36,7 +36,7 @@ public class CheckingSys {
 		}
 	}
 
-	public user giveUSer() {
+	public user giveUser() {
 		return user;
 	}
 	
