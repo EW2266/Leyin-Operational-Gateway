@@ -43,7 +43,7 @@ public class CheckingSys {
 	private boolean inlist(String str) {
 		for(String s : names) {
 			if(str.contentEquals(s)) {
-				System.out.println("User exists");
+				//System.out.println("User exists");
 				return true;
 			}
 		}
@@ -71,7 +71,7 @@ public class CheckingSys {
 			// read till the end of the file
 			BufferedReader in = new BufferedReader(isr);
 			while((str = in.readLine()) != null ) {
-				System.out.println(str);
+				//System.out.println(str);
 				list.add(str);
 			}		
 			//System.out.println(str);

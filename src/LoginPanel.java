@@ -23,9 +23,42 @@ public class LoginPanel extends JFrame implements ActionListener{
 		text1 = new JTextField(); 
 		text2 = new JPasswordField();
 		button1 = new JButton();
-
+		
 		start_frame(uiframe,text1,text2,button1);		
+		text2.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					CheckingSys check = new CheckingSys(text1, text2);
+					if(!check.getinlist()) {
+						notinlist();
+					}
+					else if (!check.pass()) {
+						wrongpass();
+					}
+					else {
+						//System.out.println("longging in...");
+						loginpassed = true;
+
+						//System.out.println(this.getloginpassed());
+						systempanel system = new systempanel(check.giveUser());
+						this.dispose();
+
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+
+			private void dispose() {
+				uiframe.setVisible(false);
+				uiframe.dispose();
+				
+			}
+
+		});
 	}
 
 	public boolean getloginpassed() {
@@ -41,7 +74,7 @@ public class LoginPanel extends JFrame implements ActionListener{
 	}
 
 	private void notinlist() {
-		System.out.println("Not Registered");
+		//System.out.println("Not Registered");
 		JOptionPane.showMessageDialog(this.uiframe,
 				"Not registered user. Try again.",
 				"Error Message",
@@ -53,15 +86,18 @@ public class LoginPanel extends JFrame implements ActionListener{
 	private void start_frame(JFrame f, JTextField t1, JTextField t2, JButton b1) {
 
 		JLabel label1 = new JLabel();		
-		label1.setText("Enter User Name :");
+		label1.setFont(new java.awt.Font("Monospaced", 1, 15));
+		label1.setText("用户名 ：");
 		label1.setBounds(10, 10, 200, 30);
 
 		JLabel label2 = new JLabel();
-		label2.setText("Enter User Password: ");
+		label2.setFont(new java.awt.Font("Monospaced", 1, 15));
+		label2.setText("密码 ：");
 		label2.setBounds(10, 100, 200, 30);
 
 		//Buttons
-		b1 = new JButton("Login");
+		b1.setFont(new java.awt.Font("Monospaced", 1, 15));
+		b1 = new JButton("登录");
 		b1.setBounds(50, 150, 200, 100);    
 
 		t1.setBounds(150, 10, 130, 30);
@@ -88,6 +124,8 @@ public class LoginPanel extends JFrame implements ActionListener{
 
 		//packing frame
 		f.pack();
+		
+		f.setLocationRelativeTo(null);
 
 		//showing the frame
 		f.setVisible(true);
@@ -102,9 +140,9 @@ public class LoginPanel extends JFrame implements ActionListener{
 	public void dispose() {
 		uiframe.setVisible(false);
 		uiframe.dispose();
-		
-	}
 
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
@@ -122,8 +160,8 @@ public class LoginPanel extends JFrame implements ActionListener{
 				//System.out.println(this.getloginpassed());
 				systempanel system = new systempanel(check.giveUser());
 				this.dispose();
-				
-				
+
+
 
 			}
 		} catch (IOException e1) {

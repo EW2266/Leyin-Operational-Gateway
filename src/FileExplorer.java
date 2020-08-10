@@ -1,15 +1,19 @@
 
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,6 +30,7 @@ public class FileExplorer extends javax.swing.JFrame {
 	ArrayList<File> stack;
 	ArrayList<File> all;
 	user logged;
+	Image top;
 	
 	public FileExplorer() throws URISyntaxException {
 		initComponents();
@@ -149,7 +154,14 @@ public class FileExplorer extends javax.swing.JFrame {
 			JOptionPane.showMessageDialog(rootPane, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	@Override
+    public void paintComponents(Graphics g) {
+        super.paintComponents(g);
 
+		// Draw the background image.
+        g.drawImage(top, 0, 0, getWidth(),getHeight(),this);
+    }
 	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
@@ -164,18 +176,26 @@ public class FileExplorer extends javax.swing.JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setTitle("EW pre Alpha ver.");
-
-		jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Toolbar"));
-
-		jButton1.setText("BACK");
+		
+		
+		//jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Toolbar"));
+		//try {
+			//top = ImageIO.read(getClass().getResource("resources/asserts/top.png"));
+		//} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+	//	}
+		
+		jButton1.setFont(new java.awt.Font("Monospaced", 1, 15));
+		jButton1.setText("返回上级");
 		jButton1.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jButton1ActionPerformed(evt);
 			}
 		});
 
-		jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-		jLabel1.setText("Go to");
+		jLabel1.setFont(new java.awt.Font("Monospaced", 1, 15)); // NOI18N
+		jLabel1.setText("查找");
 
 		in.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -281,17 +301,4 @@ public class FileExplorer extends javax.swing.JFrame {
 
 	}//GEN-LAST:event_inActionPerformed
 
-
-	//</editor-fold>
-
-	/* Create and display the form */
-
-	public void run() throws URISyntaxException {
-		new FileExplorer().setVisible(true);
-	}
-
-
-	// Variables declaration - do not modify//GEN-BEGIN:variables
-	
-	// End of variables declaration//GEN-END:variables
 }

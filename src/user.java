@@ -23,12 +23,12 @@ public class user {
 		InputStreamReader isr = null;
 		String data = "";
 		String filename = "resources/users/" + str;
-		System.out.println(filename);
+		//System.out.println(filename);
 		try {
 			// new input stream reader is created 
 			// read till the end of the file
 			fis = this.getClass().getResourceAsStream(filename);
-			System.out.println(fis);
+			//System.out.println(fis);
 			str = "";
 			BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF8"));
 			while((str = in.readLine()) != null ) {
@@ -47,12 +47,12 @@ public class user {
 		}
 		
 		username = data.substring(data.indexOf("Username : ") + 11 , (data.indexOf("Password : "))); 
-		System.out.println(username);
+		//System.out.println(username);
 		data = data.substring(data.indexOf("Password : "));
 		password = data.substring(data.lastIndexOf("Password : ") + 11, (data.indexOf("Permission")));
-		System.out.println(password);
+		//System.out.println(password);
 		permission = Integer.parseInt(data.substring(data.length() - 1));
-		System.out.println(permission);
+		//System.out.println(permission);
 	}
 	
 	public String getpass() {
