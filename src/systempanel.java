@@ -111,20 +111,13 @@ public class systempanel{
 		
 		lb2.addActionListener(new ActionListener() 
 		{
-			FileExplorer sys;
+			secondlevelpanel sys;
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				try {
-					sys = new FileExplorer();
-					sys.setVisible(true);
+					sys = new secondlevelpanel(user);
 					uiframe.dispose();
-				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				sys.getUser(user);
 			}
 		});
 		

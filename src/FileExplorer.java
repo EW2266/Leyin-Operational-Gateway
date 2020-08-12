@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,7 @@ public class FileExplorer extends javax.swing.JFrame {
 	user logged;
 	Image top;
 	
-	public FileExplorer() throws URISyntaxException {
+	public FileExplorer(String str) throws URISyntaxException {
 		initComponents();
 		this.setLocationRelativeTo(null);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -41,8 +42,8 @@ public class FileExplorer extends javax.swing.JFrame {
 		CodeSource codeSource = main.class.getProtectionDomain().getCodeSource();
 		File jarFile = new File(codeSource.getLocation().toURI().getPath());
 		String jarDir = jarFile.getParentFile().getPath();
-		System.out.println(jarDir.toString());
-		String path = jarDir + "/resources";
+		String path = jarDir + "/resources/" + str;
+		System.out.println(path);
 		all = new ArrayList<File>();
 		getallfiles(path);
 		LoadBase(path);
@@ -58,10 +59,10 @@ public class FileExplorer extends javax.swing.JFrame {
 		ArrayList<File> folders = new ArrayList<File>();
 		for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
 		  if (listOfFiles[i].isFile()) {
-		    System.out.println("File " + listOfFiles[i].getName());
+		    //System.out.println("File " + listOfFiles[i].getName());
 		    all.add(listOfFiles[i]);
 		  } else if (listOfFiles[i].isDirectory()) {
-		    System.out.println("Directory " + listOfFiles[i].getName());
+		    //System.out.println("Directory " + listOfFiles[i].getName());
 		    folders.add(listOfFiles[i]);
 		    all.add(listOfFiles[i]);
 		  }
@@ -71,10 +72,10 @@ public class FileExplorer extends javax.swing.JFrame {
 			File[] newlistOfFiles = newfolder.listFiles();
 			for (int i = 0; i < newlistOfFiles.length; i++) {
 			  if (newlistOfFiles[i].isFile()) {
-			    System.out.println("File " + newlistOfFiles[i].getName());
+			    //System.out.println("File " + newlistOfFiles[i].getName());
 			    all.add(newlistOfFiles[i]);
 			  } else if (newlistOfFiles[i].isDirectory()) {
-			    System.out.println("Directory " + newlistOfFiles[i].getName());
+			    //System.out.println("Directory " + newlistOfFiles[i].getName());
 			    folders.add(newlistOfFiles[i]);
 			    all.add(newlistOfFiles[i]);
 			  }
@@ -90,11 +91,13 @@ public class FileExplorer extends javax.swing.JFrame {
 			for (int i = 0; i < s.length; i++) {
 				File s1 = s[i]; 
 				JButton btn;
-				btn = new JButton(s1.getName());
+		        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		        
+				btn = new JButton(s1.getName() + "                      " + sdf.format(s1.lastModified()));
 				
 				if (s1.isFile()) {
 					if(s1.getName().contains("jpg")||s1.getName().contains("png")) {
-						btn.setBackground(Color.BLACK);
+						btn.setBackground(Color.CYAN);
 					}
 					else if(s1.getName().contains("pdf")) {
 						btn.setBackground(Color.GRAY);
@@ -276,6 +279,11 @@ public class FileExplorer extends javax.swing.JFrame {
 			LoadBase(path);
 			container.revalidate();
 			container.repaint();
+		}
+		else{
+			secondlevelpanel sys;
+			sys = new secondlevelpanel(logged);
+			this.dispose();
 		}
 	}//GEN-LAST:event_jButton1ActionPerformed
 
