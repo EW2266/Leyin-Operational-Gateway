@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 
-public class secondlevelpanel {
+public class secondlevelpanel extends JFrame {
 	private user user;
 	private JFrame f;
 	private JButton[] buttons;
@@ -26,19 +26,32 @@ public class secondlevelpanel {
 		init();
 
 	}
-
+	
+	@Override
+	public void dispose() {
+		systempanel sys;
+		try {
+			sys = new systempanel(user);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.dispose();
+	}
+	
 	private void init() {
 		f = new JFrame("EW pre Alpha ver.");
 		f.setLayout(null);
 		f.setResizable(false);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		f.setPreferredSize(new Dimension(1280,720));
-
+		
 		ImageIcon background = new ImageIcon(getClass().getResource("resources/asserts/Central_logo.png"));
 		background = new ImageIcon(change(background, 1280, 720));
 		bg1 = new JLabel(background);
 		bg1.setBounds(0,0,1280,720);
-
+		
+		
 
 
 		buttons[0] = new JButton();

@@ -37,6 +37,7 @@ public class FileExplorer extends javax.swing.JFrame {
 		initComponents();
 		this.setLocationRelativeTo(null);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		container.setLayout(null);
 		stack = new ArrayList<>();
 		CodeSource codeSource = main.class.getProtectionDomain().getCodeSource();
@@ -92,31 +93,43 @@ public class FileExplorer extends javax.swing.JFrame {
 				File s1 = s[i]; 
 				JButton btn;
 		        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		        
-				btn = new JButton(s1.getName() + "                      " + sdf.format(s1.lastModified()));
-				
+				btn = new JButton();
 				if (s1.isFile()) {
 					if(s1.getName().contains("jpg")||s1.getName().contains("png")) {
+						btn = new JButton("图片                                                            "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 						btn.setBackground(Color.CYAN);
+						
 					}
 					else if(s1.getName().contains("pdf")) {
+						btn = new JButton("PDF                               "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 						btn.setBackground(Color.GRAY);
+						
 					}
 					else if(s1.getName().contains("docx")||(s1.getName().contains("doc"))){
+						btn = new JButton("文档                                                              "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 						btn.setBackground(Color.BLUE);
+						
 					}
 					else if(s1.getName().contains("xlsx")){
+						btn = new JButton("表格                                                                "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 						btn.setBackground(Color.GREEN);
+						
 					}
 					else if(s1.getName().contains("pptx")||(s1.getName().contains("ppt"))){
+						btn = new JButton("PPT                            "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 						btn.setBackground(Color.ORANGE);
+						
 					}
 					else{
+						btn = new JButton("其他                                                                "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 						btn.setBackground(Color.RED);
+						
 					}
 					btn.setForeground(Color.WHITE);
 				} else {
+					btn = new JButton("文件夹                                                               "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
 					btn.setBackground(Color.WHITE);
+					
 				}
 				btn.setBounds(0, i*50, container.getWidth(), 50);
 				btn.addActionListener(new ActionListener() {
@@ -281,12 +294,19 @@ public class FileExplorer extends javax.swing.JFrame {
 			container.repaint();
 		}
 		else{
-			secondlevelpanel sys;
-			sys = new secondlevelpanel(logged);
-			this.dispose();
+			dispose();
 		}
 	}//GEN-LAST:event_jButton1ActionPerformed
-
+	
+	
+	
+	@Override
+	public void dispose() {
+		secondlevelpanel sys;
+		sys = new secondlevelpanel(logged);
+		super.dispose();
+	}
+	
 	private void inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inActionPerformed
 		
 		System.out.println(in.getText());
