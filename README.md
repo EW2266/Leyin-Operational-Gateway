@@ -1,1 +1,1 @@
-# LEYIN_SYSTEM
+# Leyin Operational Gateway
