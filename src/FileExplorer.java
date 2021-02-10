@@ -1,12 +1,24 @@
+import com.aliyun.oss.*;
+import com.aliyun.oss.model.GetObjectRequest;
+import com.aliyun.oss.model.ListObjectsV2Request;
+import com.aliyun.oss.model.ListObjectsV2Result;
+import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.OSSObjectSummary;
+import com.aliyun.oss.model.ObjectListing;
 
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.text.SimpleDateFormat;
@@ -19,6 +31,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 
 public class FileExplorer extends javax.swing.JFrame {
 	private javax.swing.JPanel container;
@@ -28,158 +41,181 @@ public class FileExplorer extends javax.swing.JFrame {
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JScrollPane jScrollPane1;
-	ArrayList<File> stack;
-	ArrayList<File> all;
+	private String bucketName;
+	private OSS ossClient;
+	ArrayList<String> stack;
+	ArrayList<String> all;
 	user logged;
 	Image top;
-	
+
 	public FileExplorer(String str) throws URISyntaxException {
+		String endpoint = "https://oss-us-west-1.aliyuncs.com";
+		String accessKeyId = "LTAI4GDxcW1PHxsHNi1mHayL";
+		String accessKeySecret = "QmK2T457Jicpo7KHtaQjWmiMg51Igc";
+		bucketName = "leyin-test";
+		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
 		initComponents();
 		this.setLocationRelativeTo(null);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		//this.addWindowListener(new java.awt.event.WindowAdapter() {
+		// @Override
+		// public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		// if (JOptionPane.showConfirmDialog(this, 
+		// "Are you sure you want to close this window?", "Close Window?", 
+		//   JOptionPane.YES_NO_OPTION,
+		//   JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		//ossClient.shutdown();
+		// System.exit(0);
+		//}
+		//  }
+		//});
 		container.setLayout(null);
 		stack = new ArrayList<>();
-		CodeSource codeSource = main.class.getProtectionDomain().getCodeSource();
-		File jarFile = new File(codeSource.getLocation().toURI().getPath());
-		String jarDir = jarFile.getParentFile().getPath();
-		String path = jarDir + "/resources/" + str;
+		String path = "resources/" + str + "/";
 		System.out.println(path);
-		all = new ArrayList<File>();
-		getallfiles(path);
+		all = new ArrayList<String>();
+		getallfiles();
 		LoadBase(path);
 	}
-	
+
 	public void getUser(user u) {
 		logged = u;
 	}
-	
-	public void getallfiles(String path) {
-		File folder = new File(path);
-		File[] listOfFiles = folder.listFiles();
-		ArrayList<File> folders = new ArrayList<File>();
-		for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
-		  if (listOfFiles[i].isFile()) {
-		    //System.out.println("File " + listOfFiles[i].getName());
-		    all.add(listOfFiles[i]);
-		  } else if (listOfFiles[i].isDirectory()) {
-		    //System.out.println("Directory " + listOfFiles[i].getName());
-		    folders.add(listOfFiles[i]);
-		    all.add(listOfFiles[i]);
-		  }
-		}
-		if(folders.size() > 0) {
-			File newfolder = new File(folders.get(0).getPath());
-			File[] newlistOfFiles = newfolder.listFiles();
-			for (int i = 0; i < newlistOfFiles.length; i++) {
-			  if (newlistOfFiles[i].isFile()) {
-			    //System.out.println("File " + newlistOfFiles[i].getName());
-			    all.add(newlistOfFiles[i]);
-			  } else if (newlistOfFiles[i].isDirectory()) {
-			    //System.out.println("Directory " + newlistOfFiles[i].getName());
-			    folders.add(newlistOfFiles[i]);
-			    all.add(newlistOfFiles[i]);
-			  }
-			}
-			folders.remove(0);
+
+	public void getallfiles() {
+		ObjectListing objectListing = ossClient.listObjects(bucketName);
+		for (OSSObjectSummary objectSummary : objectListing.getObjectSummaries()) {
+			//System.out.println(" - " + objectSummary.getKey() + "  " +
+				//	"(size = " + objectSummary.getSize() + ")");
+			all.add(objectSummary.getKey());
 		}
 	}
-	
+
 	public void LoadBase(String dir) {
-		File f = new File(dir);
-		File[] s = f.listFiles();
-		try {
-			for (int i = 0; i < s.length; i++) {
-				File s1 = s[i]; 
-				JButton btn;
-		        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-				btn = new JButton();
-				if (s1.isFile()) {
-					if(s1.getName().contains("jpg")||s1.getName().contains("png")) {
-						btn = new JButton("图片                                                            "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-						btn.setBackground(Color.CYAN);
-						
-					}
-					else if(s1.getName().contains("pdf")) {
-						btn = new JButton("PDF                               "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-						btn.setBackground(Color.GRAY);
-						
-					}
-					else if(s1.getName().contains("docx")||(s1.getName().contains("doc"))){
-						btn = new JButton("文档                                                              "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-						btn.setBackground(Color.BLUE);
-						
-					}
-					else if(s1.getName().contains("xlsx")){
-						btn = new JButton("表格                                                                "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-						btn.setBackground(Color.GREEN);
-						
-					}
-					else if(s1.getName().contains("pptx")||(s1.getName().contains("ppt"))){
-						btn = new JButton("PPT                            "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-						btn.setBackground(Color.ORANGE);
-						
-					}
-					else{
-						btn = new JButton("其他                                                                "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-						btn.setBackground(Color.RED);
-						
-					}
-					btn.setForeground(Color.WHITE);
-				} else {
-					btn = new JButton("文件夹                                                               "+s1.getName() + "                           " + sdf.format(s1.lastModified()));
-					btn.setBackground(Color.WHITE);
-					
-				}
-				btn.setBounds(0, i*50, container.getWidth(), 50);
-				btn.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if(stack.size() >= 1 && logged.getperm() != 1) {
-							System.out.println("not high enough permisison");
-							JOptionPane.showMessageDialog(rootPane, "You don't have high engough permission", "Sorry", JOptionPane.ERROR_MESSAGE);
-						}
-						else if (s1.isFile()) {
-							try {
-								if(logged.getperm() == 1) {
-									Desktop.getDesktop().open(s1);
-								}		
-								else {
-									JOptionPane.showMessageDialog(rootPane, "You Don't Have Permission To View This File", "Sorry" , JOptionPane.ERROR_MESSAGE);
-								}
-							} catch (Exception ex) {
-								JOptionPane.showMessageDialog(rootPane, "Cant open the file!", "Sorry", JOptionPane.ERROR_MESSAGE);
-								Logger.getLogger(FileExplorer.class.getName()).log(Level.SEVERE, null, ex);
-							}
-						} 
-						else {
-							System.out.println("going to next directory");
-							stack.add(f);
-							container.removeAll();
-							LoadBase(s1.getAbsolutePath());
-							System.out.println(s1.getAbsolutePath());
-							container.revalidate();
-							container.repaint();
-						}
-					}
-				});
-				container.add(btn);
-				//System.out.println(s1);
-			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(rootPane, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		//		File f = new File(dir);
+		//		File[] s = f.listFiles();
+		//		try {
+		ArrayList<String> filesindir = new ArrayList<>();
+		ArrayList<String> folders = new ArrayList<>();
+		ArrayList<String> files = new ArrayList<>();
+		ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request(bucketName);
+		listObjectsV2Request.setPrefix(dir);
+		listObjectsV2Request.setDelimiter("/");
+		//System.out.println(dir);
+		ListObjectsV2Result result = ossClient.listObjectsV2(listObjectsV2Request);
+		System.out.println("Objects:");
+		for (OSSObjectSummary objectSummary : result.getObjectSummaries()) {
+			System.out.println(objectSummary.getKey());
+			if(!objectSummary.getKey().equals(dir))
+				files.add(objectSummary.getKey());
 		}
+		System.out.println("\nCommonPrefixes:");
+		for (String commonPrefix : result.getCommonPrefixes()) {
+			System.out.println(commonPrefix);
+			folders.add(commonPrefix);
+		}
+		filesindir.addAll(folders);
+		filesindir.addAll(files);
+		for (int i = 0; i < filesindir.size(); i++) {
+			String s = filesindir.get(i); 
+			//System.out.println("s is: " + s);
+			//System.out.println("dir is: " + dir);
+			final String s1 = s.substring(dir.length());
+			//System.out.println("s1 is: " + s1);
+			JButton btn;
+			btn = new JButton();
+			if (files.contains(s)) {
+				if(s1.contains("jpg")||s1.contains("png")||s1.contains("jfif")) {
+					btn = new JButton("图片                                                            "+s1 + "                           ");
+					btn.setBackground(Color.CYAN);
+
+				}
+				else if(s1.contains("pdf")) {
+					btn = new JButton("PDF                               "+s1 + "                           ");
+					btn.setBackground(Color.GRAY);
+
+				}
+				else if(s1.contains("docx")||(s1.contains("doc"))||s1.contains("txt")){
+					btn = new JButton("文档                                                              "+s1 + "                           ");
+					btn.setBackground(Color.BLUE);
+
+				}
+				else if(s1.contains("xlsx")){
+					btn = new JButton("表格                                                                "+s1 + "                           ");
+					btn.setBackground(Color.GREEN);
+
+				}
+				else if(s1.contains("pptx")||(s1.contains("ppt"))){
+					btn = new JButton("PPT                            "+s1 + "                           ");
+					btn.setBackground(Color.ORANGE);
+
+				}
+				else{
+					btn = new JButton("其他                                                                "+s1 + "                           ");
+					btn.setBackground(Color.RED);
+
+				}
+				btn.setForeground(Color.WHITE);
+			} else {
+				btn = new JButton("文件夹                                                               "+s1 + "                           ");
+				btn.setBackground(Color.WHITE);
+
+			}
+			btn.setBounds(0, i*50, container.getWidth(), 50);
+			btn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(stack.size() >= 1 && logged.getperm() != 1) {
+						System.out.println("not high enough permisison");
+						JOptionPane.showMessageDialog(rootPane, "You don't have high engough permission", "Sorry", JOptionPane.ERROR_MESSAGE);
+					}
+					else if (files.contains(s)) {
+						try {
+							if(logged.getperm() == 1) {
+								//Desktop.getDesktop().open(s1);
+								JFrame f = new JFrame();
+								JProgressBar bar = new JProgressBar(0,100);
+								ossClient.getObject(new GetObjectRequest(bucketName, s).
+					                    <GetObjectRequest>withProgressListener(new GetObjectProgressListener(f,bar)), new File(s1));
+							}		
+							else {
+								JOptionPane.showMessageDialog(rootPane, "You Don't Have Permission To View This File", "Sorry" , JOptionPane.ERROR_MESSAGE);
+							}
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(rootPane, "Cant open the file!", "Sorry", JOptionPane.ERROR_MESSAGE);
+							Logger.getLogger(FileExplorer.class.getName()).log(Level.SEVERE, null, ex);
+						}
+					} 
+					else {
+						System.out.println("going to next directory");
+						stack.add(dir);
+						container.removeAll();
+						LoadBase(s);
+						System.out.println(s);
+						container.revalidate();
+						container.repaint();
+					}
+				}
+			});
+			container.add(btn);
+			//System.out.println(s1);
+		}
+		//		} catch (Exception e) {
+		//			JOptionPane.showMessageDialog(rootPane, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		//		}
 	}
-	
+
 	@Override
-    public void paintComponents(Graphics g) {
-        super.paintComponents(g);
+	public void paintComponents(Graphics g) {
+		super.paintComponents(g);
 
 		// Draw the background image.
-        g.drawImage(top, 0, 0, getWidth(),getHeight(),this);
-    }
+		g.drawImage(top, 0, 0, getWidth(),getHeight(),this);
+	}
 	@SuppressWarnings("unchecked")
-	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+
 	private void initComponents() {
 
 		jPanel1 = new javax.swing.JPanel();
@@ -192,16 +228,16 @@ public class FileExplorer extends javax.swing.JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setTitle("EW pre Alpha ver.");
-		
-		
+
+
 		//jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Toolbar"));
 		//try {
-			//top = ImageIO.read(getClass().getResource("resources/asserts/top.png"));
+		//top = ImageIO.read(getClass().getResource("resources/asserts/top.png"));
 		//} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-	//	}
-		
+		// TODO Auto-generated catch block
+		//e.printStackTrace();
+		//	}
+
 		jButton1.setFont(new java.awt.Font("Monospaced", 1, 15));
 		jButton1.setText("返回上级");
 		jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -221,23 +257,23 @@ public class FileExplorer extends javax.swing.JFrame {
 
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
-		
-		
-		 
+
+
+
 		jPanel1Layout.setHorizontalGroup(
 				jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel1Layout.createSequentialGroup()
 						.addContainerGap()
-		                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-		                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 347, Short.MAX_VALUE)
-		                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-		                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-		                .addComponent(in, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-		                .addContainerGap())
+						.addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 347, Short.MAX_VALUE)
+						.addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addComponent(in, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addContainerGap())
 				);
-		
-		
-		
+
+
+
 		jPanel1Layout.setVerticalGroup(
 				jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel1Layout.createSequentialGroup()
@@ -250,8 +286,8 @@ public class FileExplorer extends javax.swing.JFrame {
 								.addComponent(jButton1))
 						.addContainerGap(13, Short.MAX_VALUE))
 				);
-		
-		
+
+
 		container.setLayout(new java.awt.GridLayout(0, 3, 10, 10));
 		jScrollPane1.setViewportView(container);
 
@@ -285,8 +321,8 @@ public class FileExplorer extends javax.swing.JFrame {
 
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 		if (stack.size() > 0) {
-			String path = stack.get(stack.size() - 1).getAbsolutePath();
-			System.out.println(path + " Switch");
+			String path = stack.get(stack.size() - 1);
+			System.out.println(path + "    返回上级");
 			stack.remove(stack.size() - 1);
 			container.removeAll();
 			LoadBase(path);
@@ -297,26 +333,32 @@ public class FileExplorer extends javax.swing.JFrame {
 			dispose();
 		}
 	}//GEN-LAST:event_jButton1ActionPerformed
-	
-	
-	
+
+
+
 	@Override
 	public void dispose() {
-		secondlevelpanel sys;
-		sys = new secondlevelpanel(logged);
-		super.dispose();
+		if (JOptionPane.showConfirmDialog(this, 
+				"Are you sure you want to close this window?", "Close Window?", 
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+			ossClient.shutdown();
+			secondlevelpanel sys;
+			sys = new secondlevelpanel(logged);
+			super.dispose();
+		}
 	}
-	
+
 	private void inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inActionPerformed
-		
+
 		System.out.println(in.getText());
 		int i = 1;
-		for(File a : all) {
+		for(String a : all) {
 			i++;
-			if (in.getText().equals(a.getName())) {
+			if (in.getText().contains(a)) {
 				container.removeAll();
 				stack.add(a);
-				LoadBase(a.getPath());
+				LoadBase(a);
 				container.revalidate();
 				container.repaint();
 				break;
@@ -325,8 +367,8 @@ public class FileExplorer extends javax.swing.JFrame {
 		if(i > all.size()) {
 			JOptionPane.showMessageDialog(rootPane, "Invalid Directory", "Error", JOptionPane.ERROR_MESSAGE);
 		}
-		
+
 
 	}//GEN-LAST:event_inActionPerformed
-
+	
 }

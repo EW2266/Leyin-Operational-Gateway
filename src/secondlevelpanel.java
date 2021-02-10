@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,12 +14,18 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.ListObjectsV2Request;
+import com.aliyun.oss.model.ListObjectsV2Result;
+
 
 public class secondlevelpanel extends JFrame {
 	private user user;
 	private JFrame f;
 	private JButton[] buttons;
 	private JLabel bg1,bg2;
+	private OSS ossClient;
 
 	public secondlevelpanel(user u) {
 		user = u;
@@ -26,32 +33,38 @@ public class secondlevelpanel extends JFrame {
 		init();
 
 	}
-	
+
 	@Override
 	public void dispose() {
-		systempanel sys;
-		try {
+		System.out.println("dispose");
+		if (JOptionPane.showConfirmDialog(this, 
+				"Are you sure you want to close this window?", "Close Window?", 
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+			systempanel sys;
+
+			ossClient.shutdown();
+
+			System.out.println("back to systempanel");
 			sys = new systempanel(user);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			super.dispose();
 		}
-		super.dispose();
 	}
-	
+
 	private void init() {
 		f = new JFrame("EW pre Alpha ver.");
 		f.setLayout(null);
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		f.setPreferredSize(new Dimension(1280,720));
-		
+
 		ImageIcon background = new ImageIcon(getClass().getResource("resources/asserts/Central_logo.png"));
 		background = new ImageIcon(change(background, 1280, 720));
 		bg1 = new JLabel(background);
 		bg1.setBounds(0,0,1280,720);
-		
-		
+
+
 
 
 		buttons[0] = new JButton();
@@ -177,11 +190,11 @@ public class secondlevelpanel extends JFrame {
 					}
 				});
 			}
-			
-			
-			
-			
-			
+
+
+
+
+
 			switch(buttons[i].getName()) {
 			case "教研": 
 				System.out.println(1);
@@ -209,7 +222,7 @@ public class secondlevelpanel extends JFrame {
 			}
 
 		}
-		
+
 		ImageIcon background = new ImageIcon(getClass().getResource("resources/asserts/Secondary_cat.png"));
 		background = new ImageIcon(change(background, 1280, 720));
 		bg2 = new JLabel(background);
@@ -377,6 +390,7 @@ public class secondlevelpanel extends JFrame {
 						sys = new FileExplorer("乐印总店/教研/" + buttons[7].getName());
 						sys.setVisible(true);
 						sys.getUser(user);
+						ossClient.shutdown();
 						f.dispose();
 					} catch (URISyntaxException e1) {
 						// TODO Auto-generated catch block
@@ -400,6 +414,7 @@ public class secondlevelpanel extends JFrame {
 						sys = new FileExplorer("乐印总店/教研/" + buttons[8].getName());
 						sys.setVisible(true);
 						sys.getUser(user);
+						ossClient.shutdown();
 						f.dispose();
 					} catch (URISyntaxException e1) {
 						// TODO Auto-generated catch block
@@ -418,34 +433,58 @@ public class secondlevelpanel extends JFrame {
 		f.repaint();
 	}
 
-	
+
 	private void setnames(int start, int end, String str) {
-		CodeSource codeSource = main.class.getProtectionDomain().getCodeSource();
-		File jarFile = null;
-		try {
-			jarFile = new File(codeSource.getLocation().toURI().getPath());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+		String endpoint = "https://oss-us-west-1.aliyuncs.com";
+		String accessKeyId = "LTAI4GDxcW1PHxsHNi1mHayL";
+		String accessKeySecret = "QmK2T457Jicpo7KHtaQjWmiMg51Igc";
+		String bucketName = "leyin-test";
+		ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+		ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request(bucketName);
+		listObjectsV2Request.setPrefix("resources/"+str+"/");
+		listObjectsV2Request.setDelimiter("/");
+		ListObjectsV2Result result = ossClient.listObjectsV2(listObjectsV2Request);
+		System.out.println("\nCommonPrefixes:");
+		ArrayList<String> listOfFiles = new ArrayList<>();
+		for (String commonPrefix : result.getCommonPrefixes()) {
+			System.out.println(commonPrefix);
+			listOfFiles.add(commonPrefix);
 		}
-		String jarDir = jarFile.getParentFile().getPath();
+		//try {
+		//	jarFile = new File(codeSource.getLocation().toURI().getPath());
+		//} catch (URISyntaxException e) {
+		//	e.printStackTrace();
+		//}
+		//String Dir = jarFile.getParentFile().getPath();
 		//System.out.println(jarDir.toString());
-		String path = jarDir + "/resources/" + str;
-		File folder = new File(path);
-		File[] listOfFiles = folder.listFiles();
+		//String path = "/resources/" + str;
+		//File folder = new File(path);
+		//File[] listOfFiles = folder.listFiles();
 		for(int i = start; i < end; i++) {
-			if(listOfFiles.length > 2) {
-				System.out.println("buttons NO." + i + "Name is: " + listOfFiles[i- 1].getName());
-				buttons[i].setName(listOfFiles[i - 1].getName());
-				buttons[i].setText(listOfFiles[i - 1].getName());
+			if(listOfFiles.size() > 2) {
+				System.out.println("buttons NO." + i + " Name is: " + listOfFiles.get(i - 1));
+				String s = listOfFiles.get(i-1);
+				s = s.substring(s.length() - 3);
+				s = s.substring(0,2);
+				System.out.println(s);
+				buttons[i].setName(s);
+				buttons[i].setText(s);
 			}
 			else {
-				buttons[start].setName(listOfFiles[0].getName());
-				buttons[start].setText(listOfFiles[0].getName());
-				buttons[end - 1].setName(listOfFiles[1].getName());
-				buttons[end - 1].setText(listOfFiles[1].getName());
+				String s = listOfFiles.get(0);
+				s = s.substring(s.length() - 3);
+				s = s.substring(0,2);
+				System.out.println(s);
+				buttons[start].setName(s);
+				buttons[start].setText(s);
+				String s2 = listOfFiles.get(1);
+				s2 = s2.substring(s2.length() - 3);
+				s2 = s2.substring(0,2);
+				buttons[end - 1].setName(s2);
+				buttons[end - 1].setText(s2);
 			}
 		}
-		
+
 	}
 
 

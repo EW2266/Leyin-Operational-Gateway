@@ -23,12 +23,14 @@ public class systempanel{
 	JLabel lb1, top;
 	JFrame uiframe;
 
-	public systempanel(user user) throws IOException {	
+	public systempanel(user user){	
 		this.user = user;
-		initComponents();
+		
+			initComponents();
+		
 	}
 
-	private void initComponents() throws IOException {
+	private void initComponents() {
 
 		uiframe = new JFrame("EW pre Alpha ver.");
 		uiframe.setLayout(null);
@@ -58,28 +60,22 @@ public class systempanel{
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// TODO Auto-generated method stub
-
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
-
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
-
 			}
-
-
 		});
 		Timer time = new Timer(3000, new ActionListener() {
 			int x = 0;
@@ -113,7 +109,7 @@ public class systempanel{
 
 
 	private void level2() throws IOException {
-		System.out.println("second level");
+		//System.out.println("second level");
 		uiframe.remove(lb1);
 		uiframe.repaint();
 		ImageIcon background = new ImageIcon(ImageIO.read(getClass().getResource("resources/asserts/top.png")));
