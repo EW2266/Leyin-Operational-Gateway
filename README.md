@@ -1,2 +1,2 @@
 # Leyin Operational Gateway
-Ignore bin and src file outside LOG folder
+Ignore bin and src folders outside LOG folder
